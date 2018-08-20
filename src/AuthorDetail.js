@@ -4,6 +4,7 @@ import axios from "axios";
 // Components
 import BookTable from "./BookTable";
 import Loading from "./Loading";
+import bookStore from "./stores/BookStore";
 
 const instance = axios.create({
   baseURL: "https://the-index-api.herokuapp.com"
@@ -38,11 +39,24 @@ class AuthorDetail extends Component {
       .catch(err => console.error(err));
   }
 
+  comparingBookList = (bookList, AuthorList) => {
+    const finalBooks = [];
+    bookList.forEach(book =>
+      AuthorList.forEach(bookAuthor => {
+        if (book.id === bookAuthor.id) {
+          finalBooks.push(book);
+        }
+      })
+    );
+    return finalBooks;
+  };
+
   render() {
     if (this.state.loading) {
       return <Loading />;
     } else {
       const author = this.state.author;
+      const books = this.comparingBookList(bookStore.books, author.books);
       return (
         <div className="author">
           <div>
@@ -53,7 +67,7 @@ class AuthorDetail extends Component {
               alt={author.first_name + " " + author.last_name}
             />
           </div>
-          <BookTable books={author.books} />
+          <BookTable books={books} />
         </div>
       );
     }
